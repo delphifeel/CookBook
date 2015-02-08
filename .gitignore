@@ -1,5 +1,6 @@
 # My ignore
 *.pyc
+.idea
 
 # Windows image file caches
 Thumbs.db

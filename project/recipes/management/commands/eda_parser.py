@@ -6,33 +6,34 @@ import urllib.request
 import time
 
 
-class PovarenokParser(IParser):
+class EdaRuParser(IParser):
     def url(self):
-        return 'povarenok.ru'
+        return 'eda.ru'
 
     def execute(self):
-        reg = re.compile(r'<a href="http://www.povarenok.ru/recipes/show/(\d+)/" title=".*?">(.*?)</a>')
-        reg_ingredient_name = re.compile(r'<span itemprop="name">(.*?)</span>')
-        reg_ingredient_amount = re.compile(r'<span itemprop="amount">(\d+)</span>')
+        reg = re.compile(r'<a id="link-recipewidget-recipeName-\d+" href="(http://eda.ru/salad/recipe.*?)">(.*?)</a>')
+        reg_ingredient_name = re.compile(r'<td class="name"><span>(.*?)</span></td>')
+        reg_ingredient_amount = re.compile(r'<span class="amount">(\d+)</span>')
 
         for i in range(1, 2):
             print('Parsing page number {}'.format(i))
 
-            data = urllib.request.urlopen('http://www.povarenok.ru/recipes/~{}'.format(i)).read()
-            time.sleep(5)
+            data = urllib.request.urlopen('http://eda.ru/recipelist/salad/page{}'.format(i)).read()
+            data = data.decode('utf8')
+            #time.sleep(1)
 
             data_all = reg.findall(data)
-            for (code, recipe_name) in data_all:
-                recipe_url = r'http://www.povarenok.ru/recipes/show/{}/'.format(code)
+            for (recipe_url, recipe_name) in data_all:
                 rec = Recipe()
-                rec.name = recipe_name
+                rec.name = 'Привет тест'
                 rec.url = recipe_url
                 rec.save()
 
                 ingredients = []
 
-                data = urllib.request.urlopen('http://www.povarenok.ru/recipes/show/{}/'.format(code)).read()
-                time.sleep(5)
+                data = urllib.request.urlopen(recipe_url).read()
+                data = data.decode('utf8')
+                #time.sleep(1)
 
                 data_all = reg_ingredient_name.findall(data)
                 for ing_name in data_all:
