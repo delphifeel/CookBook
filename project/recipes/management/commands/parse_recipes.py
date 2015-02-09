@@ -1,11 +1,22 @@
 from django.core.management import BaseCommand
 from recipes.management.commands.eda_parser import EdaRuParser
-from recipes.management.commands.povarenok_parser import PovarenokParser
-from recipes.management.commands.test import TestParser
-from recipes.models import Recipe, Ingredient, RecipeIngredients
+
+
+class Worker:
+    parsers = [EdaRuParser()]
+
+    def parse(self, url):
+        found = False
+        for p in self.parsers:
+            if p.url() == url:
+                p.execute()
+                found = True
+
+        if not found:
+            raise Exception('Parser {} not implemented'.format(url))
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        parser = TestParser()
-        parser.execute()
+        w = Worker()
+        w.parse('eda.ru')
